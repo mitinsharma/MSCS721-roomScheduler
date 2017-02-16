@@ -60,8 +60,10 @@ public class RoomScheduler {
 				exportRooms(rooms);
 				break;
 			case 0:
-				System.out.println(listRooms(rooms));
+				end = true;
 				break;
+			default:
+				System.out.print("Please enter number between 0 - 7");
 			}
 
 		}
