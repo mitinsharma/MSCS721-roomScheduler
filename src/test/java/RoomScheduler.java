@@ -8,7 +8,7 @@
  * 
  * Finding bugs and adding export/import functionality
  */
-package com.marist.mscs721;
+package test.java;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
