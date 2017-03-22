@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: test.java.MeetingTestCase
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.032 sec <<< FAILURE! - in test.java.MeetingTestCase
+test(test.java.MeetingTestCase)  Time elapsed: 0.005 sec  <<< ERROR!
+java.lang.NullPointerException
+	at test.java.MeetingTestCase.test(MeetingTestCase.java:14)
+
