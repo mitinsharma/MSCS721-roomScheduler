@@ -78,11 +78,11 @@ public class RoomScheduler {
 				break;
 			case 6:
 				logger.info("Import Room Call");
-				//rooms = importRooms();
+				rooms = importRooms();
 				break;
 			case 7:
 				logger.info("Export Room Call");
-				//exportRooms(rooms);
+				exportRooms(rooms);
 				break;
 			case 0:
 				end = true;
