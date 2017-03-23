@@ -11,12 +11,25 @@
 package com.marist.mscs721;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.*;
+
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.SimpleLayout;
+
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.SimpleLayout;
+import org.apache.log4j.FileAppender;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -25,45 +38,58 @@ import com.google.gson.GsonBuilder;
 public class RoomScheduler {
 	//Keyboard Scanner Class decalaration
 	public static Scanner keyboard;
-
+	private static final Logger logger = Logger.getLogger(RoomScheduler.class.getName());
 	/**
 	 * Main function
 	 * @param args
+	 * @throws MalformedURLException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws MalformedURLException {
+		PropertyConfigurator.configure("log4j.properties");
+		logger.info("Program Starts");
 		Boolean end = false;
 		keyboard= new Scanner(System.in);
 		ArrayList<Room> rooms = new ArrayList<Room>();
+		
+		
 
 		while (!end) {
 			switch (mainMenu()) {
 
 			case 1:
+				logger.info("Add Room Call");
 				System.out.println(addRoom(rooms));
 				break;
 			case 2:
+				logger.info("Remove Room Call");
 				System.out.println(removeRoom(rooms));
 				break;
 			case 3:
+				logger.info("Schedule Room Call");
 				System.out.print(scheduleRoom(rooms));
 				break;
 			case 4:
+				logger.info("List Schedule Call");
 				System.out.println(listSchedule(rooms));
 				break;
 			case 5:
+				logger.info("Lists Room Call");
 				System.out.println(listRooms(rooms));
 				break;
 			case 6:
+				logger.info("Import Room Call");
 				//rooms = importRooms();
 				break;
 			case 7:
+				logger.info("Export Room Call");
 				//exportRooms(rooms);
 				break;
 			case 0:
 				end = true;
+				logger.info("Program Stops");
 				break;
 			default:
-				System.out.print("Please enter number between 0 - 7");
+				logger.warn("Please enter number between 0 - 7");
 			}
 
 		}
@@ -122,7 +148,7 @@ public class RoomScheduler {
 			name = getRoomName();
 			if(checkRoomExist(roomList,name)){
 				roomExists = true;
-				System.out.print("Caution: Room name you entered is already exist, please try another name.");
+				logger.warn("Caution: Room name you entered is already exist, please try another name.");
 			}
 		}
 		while(capValid){
@@ -132,7 +158,7 @@ public class RoomScheduler {
 				capacity = keyboard.nextInt();
 			}
 			catch(Exception e){
-				System.out.print("Caution: Please enter valid integer.");
+				logger.warn("Caution: Please enter valid integer.");
 				capValid = true;
 			}
 		}
@@ -194,7 +220,7 @@ public class RoomScheduler {
 			name = getRoomName();
 			if(!checkRoomExist(roomList,name)){
 				checkRoom = true;
-				System.out.println("Caution: Room not exist, enter valid room name.");
+				logger.warn("Caution: Room not exist, enter valid room name.");
 			}
 		}
 		
@@ -210,7 +236,7 @@ public class RoomScheduler {
 				error = false;
 			}
 			else{
-				System.out.print("Caution: Invalid timestamp, please try again.");
+				logger.warn("Caution: Invalid timestamp, please try again.");
 			}
 		}
 		
@@ -228,7 +254,7 @@ public class RoomScheduler {
 				error = false;
 			}
 			else{
-				System.out.print("Caution: Invalid timestamp, please try again.");
+				logger.warn("Caution: Invalid timestamp, please try again.");
 			}
 		}
 		
@@ -256,7 +282,7 @@ public class RoomScheduler {
 			checkRoom = false;
 			if(!checkRoomExist(roomList,name)){
 				checkRoom = true;
-				System.out.println("Caution: Room not exist, enter valid room name.");
+				logger.warn("Caution: Room not exist, enter valid room name.");
 			}
 		}return roomList.get(findRoomIndex(roomList, name));
 		
@@ -346,7 +372,7 @@ public class RoomScheduler {
 			}
 			else
 			{
-				System.out.println("ERROR: Please specify a .JSON file.");
+				logger.error("ERROR: Please specify a .JSON file.");
 			}
 		}
 		//read from file
@@ -363,7 +389,7 @@ public class RoomScheduler {
 		//catch if unable to find file
 		catch(IOException e)
 		{
-			System.out.println("FAILURE: ERROR READING FROM DISK. Unable to open file. Please check file exists and path is correct.");
+			logger.error("FAILURE: ERROR READING FROM DISK. Unable to open file. Please check file exists and path is correct.");
 		}
 		return finalRooms;
 	}
@@ -385,7 +411,7 @@ public class RoomScheduler {
 		{
 			if(!filename.contains(".json"))
 			{
-				System.out.println("ERROR: Please make sure your filename ends with .json");
+				logger.error("ERROR: Please make sure your filename ends with .json");
 				System.out.println("Please specify full pathname and file to save to:");
 				filename = keyboard.next();
 			}
@@ -403,7 +429,7 @@ public class RoomScheduler {
 		}
 		catch(IOException e)
 		{
-			System.out.println("ERROR WRITING TO DISK: Unable to create JSON file. Please try again.");
+			logger.error("ERROR WRITING TO DISK: Unable to create JSON file. Please try again.");
 		}
 	}
 	

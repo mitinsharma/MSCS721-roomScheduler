@@ -1,0 +1,10 @@
+2017-03-23 11:27:42 INFO  RoomScheduler:49 - Program Starts
+2017-03-23 11:27:44 INFO  RoomScheduler:60 - Add Room Call
+2017-03-23 11:27:48 INFO  RoomScheduler:60 - Add Room Call
+2017-03-23 11:27:49 WARN  RoomScheduler:151 - Caution: Room name you entered is already exist, please try another name.
+2017-03-23 11:27:57 WARN  RoomScheduler:92 - Please enter number between 0 - 7
+2017-03-23 11:28:02 INFO  RoomScheduler:80 - Import Room Call
+2017-03-23 11:28:03 INFO  RoomScheduler:84 - Export Room Call
+2017-03-23 11:28:05 INFO  RoomScheduler:72 - List Schedule Call
+2017-03-23 11:28:12 INFO  RoomScheduler:68 - Schedule Room Call
+2017-03-23 11:28:45 WARN  RoomScheduler:239 - Caution: Invalid timestamp, please try again.
