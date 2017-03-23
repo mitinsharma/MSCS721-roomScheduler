@@ -377,6 +377,7 @@ public class RoomScheduler {
 		}
 		//read from file
 		Gson gson = new Gson();
+		logger.info("Gson created");
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			ArrayList<?> rooms = gson.fromJson(br, ArrayList.class);
