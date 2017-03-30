@@ -37,7 +37,8 @@ import com.google.gson.GsonBuilder;
 
 public class RoomScheduler {
 	//Keyboard Scanner Class decalaration
-	public static Scanner keyboard;
+	public static Scanner keyboard = new Scanner(System.in);
+	public static Scanner sc;
 	private static final Logger logger = Logger.getLogger(RoomScheduler.class.getName());
 	/**
 	 * Main function
@@ -45,7 +46,9 @@ public class RoomScheduler {
 	 * @throws MalformedURLException 
 	 */
 	public static void main(String[] args) throws MalformedURLException {
-		PropertyConfigurator.configure("log4j.properties");
+		boolean check = new File("log4j.properties").exists();
+		if(check==true)PropertyConfigurator.configure("log4j.properties");
+		else logger.error("Log4j properties file not found");
 		logger.info("Program Starts");
 		Boolean end = false;
 		keyboard= new Scanner(System.in);
@@ -156,6 +159,10 @@ public class RoomScheduler {
 			try{
 				System.out.println("Room capacity?");
 				capacity = keyboard.nextInt();
+				if(capacity<1) { 
+					capValid = true; 
+					logger.warn("Caution: Capacity cannot be less than 1.");
+				}
 			}
 			catch(Exception e){
 				logger.warn("Caution: Please enter valid integer.");
@@ -223,43 +230,43 @@ public class RoomScheduler {
 				logger.warn("Caution: Room not exist, enter valid room name.");
 			}
 		}
+		do{
+			while(error){
+				System.out.println("Start Date? (yyyy-mm-dd):");
+				String startDate = keyboard.next();
+				System.out.println("Start Time?");
+				String startTime = keyboard.next();
+				startTime = startTime + ":00.0";
+				String timestamp = startDate + " " + startTime;
+				if(checkTimeStamp(timestamp)){
+					startTimestamp = Timestamp.valueOf(timestamp);
+					error = false;
+				}
+				else{
+					logger.warn("Caution: Invalid timestamp, please try again.");
+				}
+			}
 		
-		while(error){
-			System.out.println("Start Date? (yyyy-mm-dd):");
-			String startDate = keyboard.next();
-			System.out.println("Start Time?");
-			String startTime = keyboard.next();
-			startTime = startTime + ":00.0";
-			String timestamp = startDate + " " + startTime;
-			if(checkTimeStamp(timestamp)){
-				startTimestamp = Timestamp.valueOf(timestamp);
-				error = false;
+			error = true;
+			while(error){
+				System.out.println("End Date? (yyyy-mm-dd):");
+				String endDate = keyboard.next();
+				System.out.println("End Time?");
+				String endTime = keyboard.next();
+				endTime = endTime + ":00.0";
+				
+				String timestamp = endDate + " " + endTime;
+				if(checkTimeStamp(timestamp)){
+					endTimestamp = Timestamp.valueOf(timestamp);
+					error = false;
+				}
+				else{
+					logger.warn("Caution: Invalid timestamp, please try again.");
+				}
 			}
-			else{
-				logger.warn("Caution: Invalid timestamp, please try again.");
-			}
-		}
-		
-		error = true;
-		while(error){
-			System.out.println("End Date? (yyyy-mm-dd):");
-			String endDate = keyboard.next();
-			System.out.println("End Time?");
-			String endTime = keyboard.next();
-			endTime = endTime + ":00.0";
-
-			String timestamp = endDate + " " + endTime;
-			if(checkTimeStamp(timestamp)){
-				endTimestamp = Timestamp.valueOf(timestamp);
-				error = false;
-			}
-			else{
-				logger.warn("Caution: Invalid timestamp, please try again.");
-			}
-		}
-		
+		}while(compareTimeStamp(startTimestamp,endTimestamp));
 		System.out.println("Subject?");
-		String subject = keyboard.nextLine();
+		String subject = getSubject();
 
 		Room curRoom = getRoomFromName(roomList, name);
 
@@ -312,9 +319,26 @@ public class RoomScheduler {
 	 */
 	protected static String getRoomName() {
 		System.out.println("Room Name?");
-		return keyboard.next();
+		sc = new Scanner(System.in);
+		return sc.nextLine();
 	}
 	
+	protected static String getSubject() {
+		sc = new Scanner(System.in);
+		return sc.nextLine();
+	}
+	
+	public static boolean compareTimeStamp(Timestamp startTimestamp, Timestamp endTimestamp)
+	{
+		if(startTimestamp.before(endTimestamp)){
+				return false;
+		}
+		else
+		{
+			logger.warn("Caution: Start date cannot be after end date");
+			return true;
+		}
+	}
 	
 	/**
 	 * Function check if room exists or not
