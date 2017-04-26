@@ -136,7 +136,7 @@ public class RoomScheduler {
 				capValid = true;
 			}
 		}
-		Room newRoom = new Room(name, capacity);
+		Room newRoom = new Room(name, capacity,"","");
 		roomList.add(newRoom);
 
 		return "Room '" + newRoom.getName() + "' added successfully!";
@@ -356,7 +356,7 @@ public class RoomScheduler {
 			ArrayList<?> rooms = gson.fromJson(br, ArrayList.class);
 			for(Object r: rooms)
 			{
-				finalRooms.add(new Room(r.toString(), 0));
+				finalRooms.add(new Room(r.toString(), 0,"",""));
 			}
 
 		}

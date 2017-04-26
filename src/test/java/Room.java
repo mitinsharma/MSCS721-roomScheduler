@@ -16,6 +16,8 @@ import java.util.ArrayList;
 public class Room {	
 	
 	private String name;
+	private String building;
+	private String location;
 	private int capacity;
 	private ArrayList<Meeting> meetings;
 	
@@ -24,8 +26,10 @@ public class Room {
 	 * @param newName
 	 * @param newCapacity
 	 */
-	public Room(String newName, int newCapacity) {
+	public Room(String newName, int newCapacity,String newBuilding, String newLocation) {
 		setName(newName);
+		setBuilding(newBuilding);
+		setLocation(newLocation);
 		setCapacity(newCapacity);
 		setMeetings(new ArrayList<Meeting>());
 	}
@@ -77,6 +81,22 @@ public class Room {
 	public String getName() {
 		return name;
 	}
+	
+	/**
+	 * Function returns building name
+	 * @return
+	 */
+	public String getBuilding() {
+		return building;
+	}
+	
+	/**
+	 * Function returns name
+	 * @return
+	 */
+	public String getLocation() {
+		return location;
+	}
 
 	/**
 	 * Function set room name
@@ -84,6 +104,22 @@ public class Room {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	/**
+	 * Function set building name
+	 * @param name
+	 */
+	public void setBuilding(String name) {
+		this.building = name;
+	}
+	
+	/**
+	 * Function set Location name
+	 * @param name
+	 */
+	public void setLocation(String name) {
+		this.location = name;
 	}
 
 	/**
