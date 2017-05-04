@@ -21,15 +21,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.*;
 
-import org.apache.log4j.FileAppender;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.SimpleLayout;
 
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
-import org.apache.log4j.FileAppender;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -47,13 +39,12 @@ public class RoomScheduler {
 	 */
 	public static void main(String[] args) throws MalformedURLException {
 		boolean check = new File("log4j.properties").exists();
-		if(check==true)PropertyConfigurator.configure("log4j.properties");
-		else logger.error("Log4j properties file not found");
+		
 		logger.info("Program Starts");
 		Boolean end = false;
 		keyboard= new Scanner(System.in);
 		ArrayList<Room> rooms = new ArrayList<Room>();
-		Meeting meeting = null;
+		
 		
 
 		while (!end) {
@@ -69,7 +60,7 @@ public class RoomScheduler {
 				break;
 			case 3:
 				logger.info("Schedule Room Call");
-				System.out.print(scheduleRoom(rooms,meeting));
+				System.out.print(scheduleRoom(rooms));
 				break;
 			case 4:
 				logger.info("List Schedule Call");
@@ -92,7 +83,7 @@ public class RoomScheduler {
 				logger.info("Program Stops");
 				break;
 			default:
-				logger.warn("Please enter number between 0 - 7");
+				logger.warning("Please enter number between 0 - 7");
 			}
 
 		}
@@ -151,11 +142,9 @@ public class RoomScheduler {
 			name = getRoomName();
 			if(checkRoomExist(roomList,name)){
 				roomExists = true;
-				logger.warn("Caution: Room name you entered is already exist, please try another name.");
+				logger.warning("Caution: Room name you entered is already exist, please try another name.");
 			}
 		}
-		String building = getBuildingName();
-		String location = getLocationName();
 		while(capValid){
 			capValid = false;
 			try{
@@ -163,15 +152,15 @@ public class RoomScheduler {
 				capacity = keyboard.nextInt();
 				if(capacity<1) { 
 					capValid = true; 
-					logger.warn("Caution: Capacity cannot be less than 1.");
+					logger.warning("Caution: Capacity cannot be less than 1.");
 				}
 			}
 			catch(Exception e){
-				logger.warn("Caution: Please enter valid integer.");
+				logger.warning("Caution: Please enter valid integer.");
 				capValid = true;
 			}
 		}
-		Room newRoom = new Room(name, capacity,building,location);
+		Room newRoom = new Room(name, capacity);
 		roomList.add(newRoom);
 
 		return "Room '" + newRoom.getName() + "' added successfully!";
@@ -202,11 +191,11 @@ public class RoomScheduler {
 	 * @return
 	 */
 	protected static String listRooms(ArrayList<Room> roomList) {
-		System.out.println("Room Name - Capacity - Building - Location");
+		System.out.println("Room Name - Capacity");
 		System.out.println("---------------------");
 
 		for (Room room : roomList) {
-			System.out.println(room.getName() + " \t\t " + room.getCapacity()+" \t\t " + room.getBuilding()+ " \t\t" + room.getLocation());
+			System.out.println(room.getName() + " - " + room.getCapacity());
 		}
 
 		System.out.println("---------------------");
@@ -219,12 +208,19 @@ public class RoomScheduler {
 	 * @param roomList
 	 * @return
 	 */
-	protected static String scheduleRoom(ArrayList<Room> roomList,Meeting meeting) {
+	protected static String scheduleRoom(ArrayList<Room> roomList) {
 		System.out.println("Schedule a room:");
 		boolean checkRoom = true, error = true;
 		String name="";
 		Timestamp startTimestamp= null, endTimestamp=null;
-		
+		while(checkRoom){	
+			checkRoom = false;
+			name = getRoomName();
+			if(!checkRoomExist(roomList,name)){
+				checkRoom = true;
+				logger.warning("Caution: Room not exist, enter valid room name.");
+			}
+		}
 		do{
 			while(error){
 				System.out.println("Start Date? (yyyy-mm-dd):");
@@ -238,7 +234,7 @@ public class RoomScheduler {
 					error = false;
 				}
 				else{
-					logger.warn("Caution: Invalid timestamp, please try again.");
+					logger.warning("Caution: Invalid timestamp, please try again.");
 				}
 			}
 		
@@ -256,85 +252,22 @@ public class RoomScheduler {
 					error = false;
 				}
 				else{
-					logger.warn("Caution: Invalid timestamp, please try again.");
+					logger.warning("Caution: Invalid timestamp, please try again.");
 				}
 			}
 		}while(compareTimeStamp(startTimestamp,endTimestamp));
-		
-
-		//List Available room as reference
-		
-		listAvailableRoom(roomList,startTimestamp, endTimestamp);
-		
-		
-		while(checkRoom){	
-			checkRoom = false;
-			name = getRoomName();
-			if(!checkRoomExist(roomList,name)){
-				checkRoom = true;
-				logger.warn("Caution: Room not exist, enter valid room name.");
-			}
-		}
-		
 		System.out.println("Subject?");
 		String subject = getSubject();
-		
+
 		Room curRoom = getRoomFromName(roomList, name);
 
-		meeting = new Meeting(startTimestamp, endTimestamp, subject);
+		Meeting meeting = new Meeting(startTimestamp, endTimestamp, subject);
 
 		curRoom.addMeeting(meeting);
 
-		return "Successfully scheduled meeting!\n";
+		return "Successfully scheduled meeting!";
 	}
-	
-	/**
-	 * List Available room
-	 */
-	protected static void listAvailableRoom(ArrayList<Room> roomList,Timestamp starttp,Timestamp endtp){
-		System.out.println("---------Rooms Available------------");
-		System.out.println("Room Name - Capacity");
-		System.out.println("---------------------");
 
-		for (Room room : roomList) {
-			if(checkSchedule(roomList,room.getName(),starttp,endtp))
-				System.out.println(room.getName() + " \t\t " + room.getCapacity());
-		}
-
-		System.out.println("---------------------");
-
-	}
-	
-	/**
-	 * Function Check schedules
-	 * @param roomList
-	 * @return
-	 */
-	protected static Boolean checkSchedule(ArrayList<Room> roomList,String roomName,Timestamp starttp,Timestamp endtp) {
-		
-		Boolean flag = true;
-		//System.out.println("Checking for " + roomName);
-		for (Meeting m : getRoomFromName(roomList, roomName).getMeetings()) {
-			//System.out.println(m.toString());
-			Timestamp meeting_start_time = m.getStartTime();
-			Timestamp meeting_end_time = m.getStopTime();
-			//System.out.println("checking for room : "+ roomName);
-			if((compareTimeStamp(meeting_start_time,starttp) && compareTimeStamp(meeting_end_time,starttp)) 
-					&& (compareTimeStamp(endtp,meeting_start_time) && compareTimeStamp(endtp,meeting_end_time))){
-				flag = false;
-				//System.out.println("false");
-			}
-			else{
-				flag = true;
-				//System.out.println("true");
-			}
-				
-		
-		}
-
-		return flag;
-	}
-	
 	/**
 	 * Function get room model from name
 	 * @param roomList
@@ -347,7 +280,7 @@ public class RoomScheduler {
 			checkRoom = false;
 			if(!checkRoomExist(roomList,name)){
 				checkRoom = true;
-				logger.warn("Caution: Room not exist, enter valid room name.");
+				logger.warning("Caution: Room not exist, enter valid room name.");
 			}
 		}return roomList.get(findRoomIndex(roomList, name));
 		
@@ -381,26 +314,6 @@ public class RoomScheduler {
 		return sc.nextLine();
 	}
 	
-	/**
-	 * Function get building names
-	 * @return
-	 */
-	protected static String getBuildingName() {
-		System.out.println("Building Name?");
-		sc = new Scanner(System.in);
-		return sc.nextLine();
-	}
-	
-	/**
-	 * Function get location names
-	 * @return
-	 */
-	protected static String getLocationName() {
-		System.out.println("Location Name?");
-		sc = new Scanner(System.in);
-		return sc.nextLine();
-	}
-	
 	protected static String getSubject() {
 		sc = new Scanner(System.in);
 		return sc.nextLine();
@@ -413,7 +326,7 @@ public class RoomScheduler {
 		}
 		else
 		{
-			//logger.warn("Caution: Start date cannot be after end date");
+			logger.warning("Caution: Start date cannot be after end date");
 			return true;
 		}
 	}
@@ -474,7 +387,7 @@ public class RoomScheduler {
 			}
 			else
 			{
-				logger.error("ERROR: Please specify a .JSON file.");
+				logger.warning("ERROR: Please specify a .JSON file.");
 			}
 		}
 		//read from file
@@ -485,14 +398,14 @@ public class RoomScheduler {
 			ArrayList<?> rooms = gson.fromJson(br, ArrayList.class);
 			for(Object r: rooms)
 			{
-				finalRooms.add(new Room(r.toString(), 0,"",""));
+				finalRooms.add(new Room(r.toString(), 0));
 			}
 
 		}
 		//catch if unable to find file
 		catch(IOException e)
 		{
-			logger.error("FAILURE: ERROR READING FROM DISK. Unable to open file. Please check file exists and path is correct.");
+			logger.warning("FAILURE: ERROR READING FROM DISK. Unable to open file. Please check file exists and path is correct.");
 		}
 		return finalRooms;
 	}
@@ -514,7 +427,7 @@ public class RoomScheduler {
 		{
 			if(!filename.contains(".json"))
 			{
-				logger.error("ERROR: Please make sure your filename ends with .json");
+				logger.warning("ERROR: Please make sure your filename ends with .json");
 				System.out.println("Please specify full pathname and file to save to:");
 				filename = keyboard.next();
 			}
@@ -532,7 +445,7 @@ public class RoomScheduler {
 		}
 		catch(IOException e)
 		{
-			logger.error("ERROR WRITING TO DISK: Unable to create JSON file. Please try again.");
+			logger.warning("ERROR WRITING TO DISK: Unable to create JSON file. Please try again.");
 		}
 	}
 	
